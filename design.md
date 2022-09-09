@@ -15,6 +15,7 @@ Otherwise, [follow this recipe to design and create the SQL schema for your tabl
 
 Table: albums
 
+      array << album
  id |        title         | release_year | artist_id 
 ----+----------------------+--------------+-----------
   1 | Doolittle            |         1989 |         1
@@ -151,14 +152,27 @@ class AlbumsRepository
 
   # Add more methods below for each operation you'd like to implement.
 
-  # def create(album)
-  # end
+  def create(album)
+  # Executes the SQL query:
+  #INSERT INTO albums (name, release_year, artist_id) VALUES ($1, $2, $3);
+  
+  #returns nothing
+  end
 
-  # def update(album)
-  # end
+  def update(album)
 
-  # def delete(album)
-  # end
+  #Executes the SQL query:
+  # UPDATE albums SET title = $1, release_year = $2, artist_id = $3;
+
+  #returns nothing
+
+  end
+
+  def delete(id)
+  # Execute the SQL query:
+  #DELETE FROM albums WHERE id = $1
+  #returns nothing
+  end
 end
 ```
 
@@ -195,6 +209,7 @@ albums[0].artist_id #=> 2
 # 2
 # Get a single album
 
+
 repo = AlbumRepository.new
 
 album = repo.find(1)
@@ -202,7 +217,62 @@ album = repo.find(1)
 album.id # =>  1
 album.title # =>  'Surfer Rosa'
 album.release_year # =>  '1988'
-albums.artist_id #=> 2
+album.artist_id #=> 2
+
+
+
+# 3
+# create an album
+
+repo = AlbumRepository.new
+
+# Build a new model object
+album = album.new
+album.title = 'DRE'
+album.release_year = '1990'
+album.artist_id = 2
+
+repo.create(album) # Performs the INSERT query
+
+# Performs a SELECT query to get all records (implemented previously)
+all_albums = repo.all 
+
+# all_albums should contain the album 'DRE' created above.
+
+# 4
+# Delete a single album
+
+
+repo = AlbumRepository.new
+
+
+
+repo.delete(1)
+
+albums = repo.all
+
+albums.length #=>1
+
+
+
+#5 update an album record
+
+repo = AlbumRepository.new
+
+album = repo.find(1)
+
+album.title = "Fire"
+album.release_year = 2015
+album.artist_id = 3
+
+album.update(album)
+
+albums = repo.all
+
+albums[0].title #> Fire
+albums[0].release_year #> 2015
+albums[0].artist_id #> 3
+
 
 
 # Add more examples for each method
@@ -240,3 +310,12 @@ end
 
 _After each test you write, follow the test-driving process of red, green, refactor to implement the behaviour._
 
+
+
+SELECT albums.id AS album_id,
+      albums.title
+      FROM artists
+      JOIN albums
+      ON artists.id = albums.artist_id
+      WHERE artists.name = 'Pixies' AND artists.release_year = 1988;
+  
